@@ -14,3 +14,5 @@ Your activity log and goals are stored privately in that browser's local storage
 4. On iPhone, tap Share, then **Add to Home Screen**. On Android Chrome, tap the menu, then **Install app** or **Add to Home screen**.
 
 The tracker is single-player. Your point history stays in the browser on each device, so the phone version begins as a fresh profile and does not sync with your computer.
+
+Use **Backup progress** in the app to save your entries and goals to a small `.json` file. Keep that file somewhere safe (for example, Files, iCloud Drive, or Google Drive). Use **Restore backup** on a new or reset device to load it again.

@@ -96,6 +96,10 @@ dialog { border:4px solid var(--navy); padding:0; max-width:510px; width:calc(10
 .derived-goal { color:var(--blue); font-size:.62rem; font-weight:normal; }
 @media (max-width:760px) { .score-grid { grid-template-columns:1fr; } }
 
+.header-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:9px; }
+.restore-label { display:inline-flex; align-items:center; cursor:pointer; }
+@media (max-width:760px) { .header-actions { gap:6px; }.header-actions .secondary { font-size:.65rem; padding:7px; } }
+
 .boss-screen { padding-bottom:82px; }
 .avatar-run { position:absolute; z-index:3; bottom:11px; left:22px; right:22px; }
 .avatar-track { position:absolute; left:3%; right:3%; top:22px; height:8px; border:2px solid var(--navy); background:#fff; }

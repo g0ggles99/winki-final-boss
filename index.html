@@ -18,7 +18,12 @@
           <h1>WINKI<br />FINAL BOSS</h1>
           <p class="intro">Train hard. Surf harder. Beat your own high score.</p>
         </div>
-        <button class="secondary" id="manage-activities">Manage activities</button>
+        <div class="header-actions">
+          <button class="secondary" id="backup-data">Backup progress</button>
+          <label class="secondary restore-label" for="restore-data">Restore backup</label>
+          <input id="restore-data" type="file" accept="application/json,.json" hidden />
+          <button class="secondary" id="manage-activities">Manage activities</button>
+        </div>
       </header>
 
       <section class="boss-screen card">

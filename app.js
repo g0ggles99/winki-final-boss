@@ -65,6 +65,23 @@ function cleanSprite() {
   const process = () => { try { canvas.width = image.naturalWidth; canvas.height = image.naturalHeight; const ctx = canvas.getContext('2d', { willReadFrequently: true }); ctx.drawImage(image, 0, 0); const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height); for (let i = 0; i < pixels.data.length; i += 4) { const [r, g, b] = [pixels.data[i], pixels.data[i + 1], pixels.data[i + 2]]; if (r > 190 && b > 120 && g < 100) pixels.data[i + 3] = 0; } ctx.putImageData(pixels, 0, 0); const cleanSource = canvas.toDataURL('image/png'); image.src = cleanSource; document.querySelectorAll('.surfer-sprite').forEach(sprite => { sprite.src = cleanSource; }); } catch { /* Original sprite remains visible if canvas is unavailable. */ } };
   if (image.complete) process(); else image.addEventListener('load', process, { once: true });
 }
+function backupProgress() {
+  const backup = { app: 'Winki Final Boss', exportedAt: new Date().toISOString(), data: state };
+  const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }));
+  const link = document.createElement('a'); link.href = url; link.download = `winki-final-boss-backup-${dateKey()}.json`; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function restoreProgress(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => { try {
+    const backup = JSON.parse(reader.result), restored = backup.data;
+    if (backup.app !== 'Winki Final Boss' || !restored || !Array.isArray(restored.entries) || !Array.isArray(restored.activities)) throw new Error('Not a Winki backup');
+    if (!confirm('Restore this backup? It will replace the progress currently stored on this device.')) return;
+    state = { ...freshState(), ...restored, version: 2, goals: { ...freshState().goals, ...restored.goals } }; save(); renderActivities(); renderDashboard(); alert('Backup restored. Back to the lineup.');
+  } catch { alert('That file does not look like a Winki Final Boss backup.'); } finally { $('#restore-data').value = ''; } };
+  reader.readAsText(file);
+}
 function addEntry(activityId, date = $('#entry-date').value, note = $('#entry-note').value.trim()) { const activity = state.activities.find(a => a.id === activityId); if (!activity || !date) return; state.entries.push({ id: crypto.randomUUID(), name: activity.name, points: Number(activity.points), date, note, createdAt: Date.now() }); save(); $('#entry-note').value = ''; renderDashboard(); }
 function renderActivitySettings() { $('#activity-settings').innerHTML = state.activities.map(a => `<div class="activity-row" data-id="${a.id}"><label>Name<input class="activity-name" value="${escapeHtml(a.name)}" maxlength="32"></label><label>Points<input class="activity-points" type="number" min="1" max="1000" value="${a.points}"></label><button type="button" class="remove-activity">Remove</button></div>`).join(''); }
 function init() {
@@ -72,6 +89,8 @@ function init() {
   $('#entry-form').addEventListener('submit', e => { e.preventDefault(); addEntry($('#activity').value); });
   $('#quick-add').addEventListener('click', e => { const id = e.target.dataset.id; if (id) addEntry(id); });
   $('#entry-list').addEventListener('click', e => { const id = e.target.dataset.delete; if (id) { state.entries = state.entries.filter(x => x.id !== id); save(); renderDashboard(); } });
+  $('#backup-data').addEventListener('click', backupProgress);
+  $('#restore-data').addEventListener('change', e => restoreProgress(e.target.files[0]));
   $('.score-grid').addEventListener('click', e => { const period = e.target.dataset.period; if (!period) return; $('#goal-dialog-title').textContent = `Set ${period} goal`; $('#goal-input').value = state.goals[period]; $('#goal-form').dataset.period = period; $('#goal-dialog').showModal(); });
   $('#goal-form').addEventListener('submit', () => { const period = $('#goal-form').dataset.period, value = Number($('#goal-input').value); if (period && value > 0) { state.goals[period] = value; save(); renderDashboard(); } });
   $('#manage-activities').addEventListener('click', () => { renderActivitySettings(); $('#activities-dialog').showModal(); });
