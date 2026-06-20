@@ -1,0 +1,9 @@
+{
+  "name": "Winki Final Boss",
+  "short_name": "Winki Boss",
+  "description": "A single-player surfing progression tracker.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#7fd7eb",
+  "theme_color": "#111b46"
+}

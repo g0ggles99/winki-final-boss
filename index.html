@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#063c48" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Winki Final Boss</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Winki · player one</p>
+          <h1>WINKI<br />FINAL BOSS</h1>
+          <p class="intro">Train hard. Surf harder. Beat your own high score.</p>
+        </div>
+        <button class="secondary" id="manage-activities">Manage activities</button>
+      </header>
+
+      <section class="boss-screen card">
+        <div class="pixel-sun"></div>
+        <div class="boss-copy">
+          <p class="eyebrow">Weekly mission</p>
+          <p id="boss-status">The swell is waiting.</p>
+          <div class="level-row"><span>LEVEL</span><strong id="character-level">1</strong><span id="character-title">Grom</span></div>
+        </div>
+        <div class="character-stage"><img id="surfer-sprite" src="assets/winki-surfer-source.png" alt="Pixel-art surfer riding a wave" /><canvas id="sprite-canvas" hidden></canvas></div>
+        <div class="avatar-run" aria-label="Weekly avatar progression from zero to fifty points">
+          <div class="avatar-track"><span class="avatar-fill" id="avatar-fill"></span></div>
+          <div class="avatar-stops">
+            <div class="avatar-stop" data-ratio="0"><img class="surfer-sprite" src="assets/winki-surfer-source.png" alt="" /><span>0<br />GROM</span></div>
+            <div class="avatar-stop" data-ratio=".25"><img class="surfer-sprite" src="assets/winki-surfer-source.png" alt="" /><span>12<br />PADDLING</span></div>
+            <div class="avatar-stop" data-ratio=".5"><img class="surfer-sprite" src="assets/winki-surfer-source.png" alt="" /><span>25<br />UP &amp; RIDING</span></div>
+            <div class="avatar-stop" data-ratio=".75"><img class="surfer-sprite" src="assets/winki-surfer-source.png" alt="" /><span>38<br />CHARGING</span></div>
+            <div class="avatar-stop" data-ratio="1"><span class="boss-flag">★</span><span>50<br />BOSS CLEAR</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="today card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Today</p>
+            <h2 id="today-date"></h2>
+          </div>
+          <p class="today-score"><strong id="today-points">0</strong> pts</p>
+        </div>
+        <form id="entry-form" class="entry-form">
+          <label>
+            Activity
+            <select id="activity" required></select>
+          </label>
+          <label>
+            Date
+            <input id="entry-date" type="date" required />
+          </label>
+          <label>
+            Notes <span class="optional">optional</span>
+            <input id="entry-note" type="text" maxlength="80" placeholder="e.g. 45 min, small waves" />
+          </label>
+          <button class="primary" type="submit">Add activity</button>
+        </form>
+        <div id="quick-add" class="quick-add" aria-label="Quick add activities"></div>
+      </section>
+
+      <section class="score-grid" aria-label="Progress toward point goals">
+        <article class="score-card card" data-period="weekly">
+          <div class="score-title"><span>This week</span><button class="goal-edit" data-period="weekly" aria-label="Edit weekly goal">Edit goal</button></div>
+          <strong id="weekly-current">0</strong><span class="points-label"> / <span id="weekly-goal">50</span> pts</span>
+          <div class="progress"><span id="weekly-bar"></span></div>
+          <p id="weekly-message"></p>
+        </article>
+        <article class="score-card card" data-period="monthly">
+          <div class="score-title"><span>This month</span><span class="derived-goal">4 × weekly goal</span></div>
+          <strong id="monthly-current">0</strong><span class="points-label"> / <span id="monthly-goal">200</span> pts</span>
+          <div class="progress"><span id="monthly-bar"></span></div>
+          <p id="monthly-message"></p>
+        </article>
+        <article class="score-card card" data-period="yearly">
+          <div class="score-title"><span>This year</span><span class="derived-goal">52 × weekly goal</span></div>
+          <strong id="yearly-current">0</strong><span class="points-label"> / <span id="yearly-goal">2600</span> pts</span>
+          <div class="progress"><span id="yearly-bar"></span></div>
+          <p id="yearly-message"></p>
+        </article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="card chart-card">
+          <div class="section-heading compact"><div><p class="eyebrow">Score board</p><h2>Last 7 days</h2></div></div>
+          <div id="week-chart" class="week-chart" aria-label="Points earned across the last seven days"></div>
+        </article>
+        <article class="card recent-card">
+          <div class="section-heading compact"><div><p class="eyebrow">Run log</p><h2>Recent activity</h2></div></div>
+          <div id="entry-list" class="entry-list"></div>
+        </article>
+      </section>
+    </main>
+
+    <dialog id="goal-dialog">
+      <form method="dialog" id="goal-form">
+        <div class="dialog-heading"><h2 id="goal-dialog-title">Set goal</h2><button value="cancel" class="icon-button" aria-label="Close">×</button></div>
+        <label>Points <input id="goal-input" type="number" min="1" max="10000" required /></label>
+        <div class="dialog-actions"><button value="cancel" class="secondary">Cancel</button><button class="primary" value="default">Save goal</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="activities-dialog">
+      <form method="dialog" id="activities-form">
+        <div class="dialog-heading"><div><p class="eyebrow">Your scoring system</p><h2>Activities</h2></div><button value="cancel" class="icon-button" aria-label="Close">×</button></div>
+        <p class="dialog-copy">Choose the activities that count toward your surfing, and set the points that feel motivating.</p>
+        <div id="activity-settings" class="activity-settings"></div>
+        <div class="add-custom"><input id="new-activity-name" maxlength="32" placeholder="New activity" /><input id="new-activity-points" type="number" min="1" max="1000" placeholder="Pts" /><button type="button" class="secondary" id="add-custom">Add</button></div>
+        <div class="dialog-actions"><button value="cancel" class="secondary">Close</button><button class="primary" value="default">Save changes</button></div>
+      </form>
+    </dialog>
+    <script src="app.js"></script>
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js');</script>
+  </body>
+</html>
