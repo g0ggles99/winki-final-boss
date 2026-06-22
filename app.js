@@ -33,7 +33,8 @@ function comparisonText(current, previous, label) {
 function renderDashboard() {
   const today = new Date(), todayKey = dateKey(today), weekStart = startOfWeek(today);
   const daily = pointTotal(e => e.date === todayKey);
-  const weekly = pointTotal(e => dateFromKey(e.date) >= weekStart && dateFromKey(e.date) <= today);
+  const weekStartKey = dateKey(weekStart);
+  const weekly = pointTotal(e => e.date >= weekStartKey && e.date <= todayKey);
   const monthly = pointTotal(e => { const d = dateFromKey(e.date); return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear(); });
   const lastWeekStart = new Date(weekStart); lastWeekStart.setDate(lastWeekStart.getDate() - 7);
   const lastWeek = pointTotal(e => { const d = dateFromKey(e.date); return d >= lastWeekStart && d < weekStart; });
