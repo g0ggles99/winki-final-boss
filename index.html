@@ -29,9 +29,8 @@
       </header>
 
       <section class="boss-screen card">
-        <div class="pixel-sun"></div>
         <div class="boss-copy">
-          <p class="eyebrow">Weekly mission</p>
+          <p class="eyebrow">Weekly target</p>
           <p id="boss-status">The swell is waiting.</p>
           <div class="level-row"><span>LEVEL</span><strong id="character-level">1</strong><span id="character-title">Grom</span></div>
         </div>
@@ -99,6 +98,14 @@
         <article class="card chart-card">
           <div class="section-heading compact"><div><p class="eyebrow">Score board</p><h2>Last 7 days</h2></div></div>
           <div id="week-chart" class="week-chart" aria-label="Points earned across the last seven days"></div>
+          <div class="history-panel">
+            <div class="section-heading mini"><div><p class="eyebrow">Trend</p><h3>Last 7 weeks</h3></div></div>
+            <div id="week-history" class="period-history" aria-label="Points earned across the last seven weeks"></div>
+          </div>
+          <div class="history-panel">
+            <div class="section-heading mini"><div><p class="eyebrow">Season</p><h3>Recent months</h3></div></div>
+            <div id="month-history" class="period-history month-history" aria-label="Points earned across recent months"></div>
+          </div>
         </article>
         <article class="card recent-card">
           <div class="section-heading compact"><div><p class="eyebrow">Run log</p><h2>Recent activity</h2></div></div>

@@ -30,6 +30,25 @@ function comparisonText(current, previous, label) {
   if (delta === 0) return `Same as ${label}`;
   return delta > 0 ? `↑ ${delta} vs ${label}` : `↓ ${Math.abs(delta)} vs ${label}`;
 }
+function addDays(date, amount) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + amount);
+  return d;
+}
+function sumBetween(startKey, endKey) {
+  return pointTotal(e => e.date >= startKey && e.date <= endKey);
+}
+function renderPeriodHistory(target, rows, goal) {
+  const peak = Math.max(goal || 0, ...rows.map(row => row.total), 1);
+  $(target).innerHTML = rows.map(row => {
+    const pct = Math.min(100, Math.round(row.total / peak * 100));
+    return `<div class="period-item${row.current ? ' is-current' : ''}">
+      <div class="period-top"><span>${escapeHtml(row.label)}</span><strong>${row.total}</strong></div>
+      <div class="period-meter"><span style="width:${pct}%"></span></div>
+      <p>${escapeHtml(row.detail)}</p>
+    </div>`;
+  }).join('');
+}
 function renderDashboard() {
   const today = new Date(), todayKey = dateKey(today), weekStart = startOfWeek(today);
   const daily = pointTotal(e => e.date === todayKey);
@@ -57,6 +76,26 @@ function renderDashboard() {
   const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(today); d.setDate(today.getDate() - 6 + i); return d; });
   const values = days.map(d => pointTotal(e => e.date === dateKey(d))); const peak = Math.max(...values, 1);
   $('#week-chart').innerHTML = days.map((d, i) => `<div class="bar-group"><span class="bar-value">${values[i] || ''}</span><span class="bar" style="height:${Math.max(3, values[i] / peak * 132)}px"></span><span class="bar-label">${d.toLocaleDateString(undefined,{weekday:'short'}).slice(0,2)}</span></div>`).join('');
+  const weekRows = Array.from({ length: 7 }, (_, i) => {
+    const start = addDays(weekStart, (i - 6) * 7), end = addDays(start, 6);
+    return {
+      label: start.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+      detail: i === 6 ? 'This week' : `to ${end.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`,
+      total: sumBetween(dateKey(start), dateKey(end)),
+      current: i === 6
+    };
+  });
+  renderPeriodHistory('#week-history', weekRows, state.goals.weekly);
+  const monthRows = Array.from({ length: 7 }, (_, i) => {
+    const start = new Date(today.getFullYear(), today.getMonth() - 6 + i, 1), end = new Date(today.getFullYear(), today.getMonth() - 5 + i, 0);
+    return {
+      label: start.toLocaleDateString(undefined, { month: 'short' }),
+      detail: String(start.getFullYear()),
+      total: sumBetween(dateKey(start), dateKey(end)),
+      current: i === 6
+    };
+  });
+  renderPeriodHistory('#month-history', monthRows, monthlyGoal);
   const recent = [...state.entries].sort((a,b) => b.createdAt - a.createdAt).slice(0, 12);
   $('#entry-list').innerHTML = recent.length ? recent.map(e => `<div class="entry"><div><div class="entry-name">${escapeHtml(e.name)}</div><div class="entry-meta">${fmtDate(e.date)}${e.note ? ` · ${escapeHtml(e.note)}` : ''}</div></div><span class="entry-points">+${e.points}</span><button class="delete-entry" data-delete="${e.id}" aria-label="Delete ${escapeHtml(e.name)}">×</button></div>`).join('') : '<p class="empty">No points yet. Add your first surf-building activity above.</p>';
 }
