@@ -312,6 +312,113 @@ dialog .secondary,
   margin-bottom: 18px;
 }
 
+.surf-forecast {
+  margin-bottom: 18px;
+}
+
+.forecast-updated {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.forecast-stat {
+  padding: 16px;
+  background: #f6fafb;
+  border: 1px solid #e4eef1;
+  border-radius: 11px;
+}
+
+.forecast-call {
+  color: #fff;
+  background: linear-gradient(135deg, var(--deep), var(--ocean));
+  border-color: rgba(94, 213, 223, 0.4);
+}
+
+.forecast-call span,
+.forecast-call p {
+  color: #c7eef2;
+}
+
+.forecast-stat span {
+  color: var(--muted);
+  font-size: 0.73rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.forecast-stat strong {
+  display: block;
+  margin: 5px 0 2px;
+  font-size: 1.8rem;
+  letter-spacing: -0.05em;
+}
+
+.forecast-stat p,
+.forecast-source,
+.forecast-error {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.forecast-source {
+  margin-top: 12px;
+}
+
+.skeleton strong {
+  color: #9fb0b8;
+}
+
+.session-outlook {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.session-card {
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+}
+
+.session-card div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.session-card span {
+  color: var(--muted);
+  font-size: 0.73rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.session-card strong {
+  color: var(--teal);
+}
+
+.session-card p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .today-score {
   margin: 0;
   color: var(--muted);
@@ -519,12 +626,16 @@ select:focus {
 
 .period-history {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
+  grid-template-columns: 1fr;
+  gap: 8px;
 }
 
 .period-item {
   min-width: 0;
+  display: grid;
+  grid-template-columns: 108px 1fr 88px;
+  align-items: center;
+  gap: 12px;
   padding: 11px;
   background: #f6fafb;
   border: 1px solid #e4eef1;
@@ -541,7 +652,7 @@ select:focus {
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 9px;
+  margin: 0;
 }
 
 .period-top span {
@@ -560,9 +671,10 @@ select:focus {
 }
 
 .period-item p {
-  margin: 7px 0 0;
+  margin: 0;
   color: var(--muted);
   font-size: 0.7rem;
+  text-align: right;
 }
 
 .entry-list {
@@ -682,7 +794,9 @@ dialog form {
 @media (max-width: 900px) {
   .entry-form,
   .score-grid,
-  .dashboard-grid {
+  .dashboard-grid,
+  .forecast-grid,
+  .session-outlook {
     grid-template-columns: 1fr;
   }
 
@@ -727,27 +841,7 @@ dialog form {
     height: 32px;
   }
 
-  .period-history {
-    grid-template-columns: 1fr;
-  }
-
   .period-item {
-    display: grid;
-    grid-template-columns: 88px 1fr 70px;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .period-top {
-    margin: 0;
-  }
-
-  .period-meter {
-    order: 2;
-  }
-
-  .period-item p {
-    margin: 0;
-    text-align: right;
+    grid-template-columns: 88px 1fr 72px;
   }
 }

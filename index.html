@@ -18,7 +18,7 @@
         <div>
           <p class="eyebrow">Winki · player one</p>
           <h1>WINKI<br />FINAL BOSS</h1>
-          <p class="intro">Train hard. Surf harder. Beat your own high score.</p>
+          <p class="intro">Go hard to get to the green room</p>
         </div>
         <div class="header-actions">
           <button class="secondary" id="backup-data">Backup progress</button>
@@ -45,6 +45,23 @@
             <div class="avatar-stop" data-ratio="1"><span class="boss-flag">★</span><span>50<br />BOSS CLEAR</span></div>
           </div>
         </div>
+      </section>
+
+      <section class="surf-forecast card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Winki forecast</p>
+            <h2>Today’s surf</h2>
+          </div>
+          <p id="forecast-updated" class="forecast-updated">Loading marine forecast…</p>
+        </div>
+        <div id="forecast-grid" class="forecast-grid">
+          <div class="forecast-stat skeleton"><span>Call</span><strong>—</strong><p>loading</p></div>
+          <div class="forecast-stat skeleton"><span>Surf</span><strong>—</strong><p>wave height</p></div>
+          <div class="forecast-stat skeleton"><span>Swell</span><strong>—</strong><p>period + direction</p></div>
+          <div class="forecast-stat skeleton"><span>Wind</span><strong>—</strong><p>speed + direction</p></div>
+        </div>
+        <p class="forecast-source">Open-Meteo marine and weather model guidance for the Bells/Winki area. Use local judgement before paddling out.</p>
       </section>
 
       <section class="today card">
@@ -99,12 +116,12 @@
           <div class="section-heading compact"><div><p class="eyebrow">Score board</p><h2>Last 7 days</h2></div></div>
           <div id="week-chart" class="week-chart" aria-label="Points earned across the last seven days"></div>
           <div class="history-panel">
-            <div class="section-heading mini"><div><p class="eyebrow">Trend</p><h3>Last 7 weeks</h3></div></div>
-            <div id="week-history" class="period-history" aria-label="Points earned across the last seven weeks"></div>
+            <div class="section-heading mini"><div><p class="eyebrow">Trend</p><h3>Last 4 weeks</h3></div></div>
+            <div id="week-history" class="period-history" aria-label="Points earned across the last four weeks"></div>
           </div>
           <div class="history-panel">
-            <div class="section-heading mini"><div><p class="eyebrow">Season</p><h3>Recent months</h3></div></div>
-            <div id="month-history" class="period-history month-history" aria-label="Points earned across recent months"></div>
+            <div class="section-heading mini"><div><p class="eyebrow">Season</p><h3>Recent 4 months</h3></div></div>
+            <div id="month-history" class="period-history month-history" aria-label="Points earned across the last four months"></div>
           </div>
         </article>
         <article class="card recent-card">

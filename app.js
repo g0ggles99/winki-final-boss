@@ -49,6 +49,80 @@ function renderPeriodHistory(target, rows, goal) {
     </div>`;
   }).join('');
 }
+function directionLabel(degrees) {
+  if (degrees === null || degrees === undefined || Number.isNaN(Number(degrees))) return '—';
+  const labels = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  return labels[Math.round(Number(degrees) / 45) % 8];
+}
+function fmt(value, unit = '') {
+  return value === null || value === undefined || Number.isNaN(Number(value)) ? '—' : `${Number(value).toFixed(1)}${unit}`;
+}
+function angleDiff(a, b) {
+  return Math.abs(((Number(a) - Number(b) + 540) % 360) - 180);
+}
+function surfScore(row) {
+  let score = 0;
+  if (row.wave >= 0.7 && row.wave <= 2.4) score += 2; else if (row.wave >= 0.4 && row.wave <= 3.2) score += 1;
+  if (row.period >= 12) score += 2; else if (row.period >= 9) score += 1;
+  if (angleDiff(row.swellDirection, 220) <= 55) score += 1;
+  if (row.wind <= 12) score += 2; else if (row.wind <= 22) score += 1;
+  if (angleDiff(row.windDirection, 320) <= 70) score += 1;
+  return score;
+}
+function surfRating(score) {
+  if (score >= 7) return 'Good';
+  if (score >= 5) return 'Fair';
+  if (score >= 3) return 'Workable';
+  return 'Poor';
+}
+function nearestHourlyIndex(times, hour) {
+  let best = 0, bestDiff = Infinity;
+  times.forEach((time, i) => {
+    const diff = Math.abs(new Date(time).getHours() - hour);
+    if (diff < bestDiff) { best = i; bestDiff = diff; }
+  });
+  return best;
+}
+async function renderSurfForecast() {
+  const grid = $('#forecast-grid'), updated = $('#forecast-updated');
+  const marineUrl = 'https://marine-api.open-meteo.com/v1/marine?latitude=-38.37&longitude=144.28&hourly=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period&timezone=Australia%2FMelbourne&forecast_days=1&cell_selection=sea';
+  const weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=-38.37&longitude=144.28&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=Australia%2FMelbourne&forecast_days=1&wind_speed_unit=kmh';
+  try {
+    const [marineRes, weatherRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
+    if (!marineRes.ok || !weatherRes.ok) throw new Error('Forecast unavailable');
+    const marine = await marineRes.json(), weather = await weatherRes.json();
+    const times = marine.hourly?.time || [];
+    const windows = [{ label: 'Dawn', hour: 6 }, { label: 'Midday', hour: 12 }, { label: 'Late arvo', hour: 17 }].map(slot => {
+      const i = nearestHourlyIndex(times, slot.hour);
+      const row = {
+        label: slot.label,
+        time: times[i],
+        wave: marine.hourly.wave_height?.[i],
+        waveDirection: marine.hourly.wave_direction?.[i],
+        period: marine.hourly.wave_period?.[i],
+        swell: marine.hourly.swell_wave_height?.[i],
+        swellDirection: marine.hourly.swell_wave_direction?.[i],
+        swellPeriod: marine.hourly.swell_wave_period?.[i],
+        wind: weather.hourly.wind_speed_10m?.[i],
+        windDirection: weather.hourly.wind_direction_10m?.[i],
+        gust: weather.hourly.wind_gusts_10m?.[i]
+      };
+      row.score = surfScore(row); row.rating = surfRating(row.score);
+      return row;
+    });
+    const best = [...windows].sort((a, b) => b.score - a.score)[0], faceMin = Math.max(0.2, best.wave * 0.8), faceMax = best.wave * 1.3;
+    grid.innerHTML = `
+      <div class="forecast-stat forecast-call"><span>Surf call</span><strong>${best.rating}</strong><p>Best window: ${best.label}</p></div>
+      <div class="forecast-stat"><span>Surf</span><strong>${faceMin.toFixed(1)}–${faceMax.toFixed(1)}m</strong><p>approx face range</p></div>
+      <div class="forecast-stat"><span>Swell</span><strong>${fmt(best.swell || best.wave, 'm')}</strong><p>${fmt(best.swellPeriod || best.period, 's')} · ${directionLabel(best.swellDirection || best.waveDirection)}</p></div>
+      <div class="forecast-stat"><span>Wind</span><strong>${Math.round(best.wind || 0)} km/h</strong><p>${directionLabel(best.windDirection)} · gusts ${Math.round(best.gust || 0)}</p></div>
+      <div class="session-outlook">${windows.map(row => `<div class="session-card"><div><span>${row.label}</span><strong>${row.rating}</strong></div><p>${fmt(row.wave, 'm')} @ ${fmt(row.period, 's')} · ${directionLabel(row.swellDirection || row.waveDirection)} swell</p><p>${Math.round(row.wind || 0)} km/h ${directionLabel(row.windDirection)} wind</p></div>`).join('')}</div>`;
+    updated.textContent = `Updated ${new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`;
+  } catch {
+    updated.textContent = 'Forecast unavailable';
+    grid.innerHTML = '<p class="forecast-error">Could not load the marine forecast right now. Try again later.</p>';
+  }
+}
 function renderDashboard() {
   const today = new Date(), todayKey = dateKey(today), weekStart = startOfWeek(today);
   const daily = pointTotal(e => e.date === todayKey);
@@ -76,23 +150,23 @@ function renderDashboard() {
   const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(today); d.setDate(today.getDate() - 6 + i); return d; });
   const values = days.map(d => pointTotal(e => e.date === dateKey(d))); const peak = Math.max(...values, 1);
   $('#week-chart').innerHTML = days.map((d, i) => `<div class="bar-group"><span class="bar-value">${values[i] || ''}</span><span class="bar" style="height:${Math.max(3, values[i] / peak * 132)}px"></span><span class="bar-label">${d.toLocaleDateString(undefined,{weekday:'short'}).slice(0,2)}</span></div>`).join('');
-  const weekRows = Array.from({ length: 7 }, (_, i) => {
-    const start = addDays(weekStart, (i - 6) * 7), end = addDays(start, 6);
+  const weekRows = Array.from({ length: 4 }, (_, i) => {
+    const start = addDays(weekStart, -i * 7), end = addDays(start, 6);
     return {
       label: start.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-      detail: i === 6 ? 'This week' : `to ${end.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`,
+      detail: i === 0 ? 'This week' : `to ${end.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`,
       total: sumBetween(dateKey(start), dateKey(end)),
-      current: i === 6
+      current: i === 0
     };
   });
   renderPeriodHistory('#week-history', weekRows, state.goals.weekly);
-  const monthRows = Array.from({ length: 7 }, (_, i) => {
-    const start = new Date(today.getFullYear(), today.getMonth() - 6 + i, 1), end = new Date(today.getFullYear(), today.getMonth() - 5 + i, 0);
+  const monthRows = Array.from({ length: 4 }, (_, i) => {
+    const start = new Date(today.getFullYear(), today.getMonth() - i, 1), end = new Date(today.getFullYear(), today.getMonth() - i + 1, 0);
     return {
       label: start.toLocaleDateString(undefined, { month: 'short' }),
-      detail: String(start.getFullYear()),
+      detail: i === 0 ? 'This month' : String(start.getFullYear()),
       total: sumBetween(dateKey(start), dateKey(end)),
-      current: i === 6
+      current: i === 0
     };
   });
   renderPeriodHistory('#month-history', monthRows, monthlyGoal);
@@ -125,7 +199,7 @@ function restoreProgress(file) {
 function addEntry(activityId, date = $('#entry-date').value, note = $('#entry-note').value.trim()) { const activity = state.activities.find(a => a.id === activityId); if (!activity || !date) return; state.entries.push({ id: crypto.randomUUID(), name: activity.name, points: Number(activity.points), date, note, createdAt: Date.now() }); save(); $('#entry-note').value = ''; renderDashboard(); }
 function renderActivitySettings() { $('#activity-settings').innerHTML = state.activities.map(a => `<div class="activity-row" data-id="${a.id}"><label>Name<input class="activity-name" value="${escapeHtml(a.name)}" maxlength="32"></label><label>Points<input class="activity-points" type="number" min="1" max="1000" value="${a.points}"></label><button type="button" class="remove-activity">Remove</button></div>`).join(''); }
 function init() {
-  $('#today-date').textContent = new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' }); $('#entry-date').value = dateKey(); cleanSprite(); renderActivities(); renderDashboard();
+  $('#today-date').textContent = new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' }); $('#entry-date').value = dateKey(); cleanSprite(); renderActivities(); renderDashboard(); renderSurfForecast();
   $('#entry-form').addEventListener('submit', e => { e.preventDefault(); addEntry($('#activity').value); });
   $('#quick-add').addEventListener('click', e => { const id = e.target.dataset.id; if (id) addEntry(id); });
   $('#entry-list').addEventListener('click', e => { const id = e.target.dataset.delete; if (id) { state.entries = state.entries.filter(x => x.id !== id); save(); renderDashboard(); } });
