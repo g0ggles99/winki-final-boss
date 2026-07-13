@@ -9,7 +9,7 @@ Your activity log and goals are stored privately in that browser's local storage
 ## Publish free with Netlify
 
 1. Go to [Netlify Drop](https://app.netlify.com/drop) on a computer.
-2. Drag this entire `surf-points-tracker` folder onto the page. Keep its contents together—the `assets` folder is needed for the character.
+2. Drag this entire `surf-points-tracker` folder onto the page. Keep its contents together—the `assets` folder is needed for the app icon.
 3. Netlify will give you a public web address. Open it on your phone.
 4. On iPhone, tap Share, then **Add to Home Screen**. On Android Chrome, tap the menu, then **Install app** or **Add to Home screen**.
 
