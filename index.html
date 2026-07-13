@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Winki Final Boss</title>
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="icon" type="image/png" href="assets/winki-app-icon.png" />
-    <link rel="apple-touch-icon" href="assets/winki-app-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="assets/winki-wave-icon.svg" />
+    <link rel="apple-touch-icon" href="assets/winki-wave-icon.svg" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -32,18 +32,14 @@
         <div class="boss-copy">
           <p class="eyebrow">Weekly target</p>
           <p id="boss-status">The swell is waiting.</p>
-          <div class="level-row"><span>LEVEL</span><strong id="character-level">1</strong><span id="character-title">Grom</span></div>
+          <div class="level-row"><span>Goal</span><strong id="weekly-target-badge">50</strong><span>points this week</span></div>
         </div>
-        <div class="character-stage"><img id="surfer-sprite" src="assets/winki-surfer-source.png" alt="Pixel-art surfer riding a wave" /><canvas id="sprite-canvas" hidden></canvas></div>
-        <div class="avatar-run" aria-label="Weekly avatar progression from zero to fifty points">
-          <div class="avatar-track"><span class="avatar-fill" id="avatar-fill"></span></div>
-          <div class="avatar-stops">
-            <div class="avatar-stop" data-ratio="0"><img class="surfer-sprite" src="assets/winki-surfer-source.png" alt="" /><span>0<br />GROM</span></div>
-            <div class="avatar-stop" data-ratio=".25"><img class="surfer-sprite" src="assets/winki-surfer-source.png" alt="" /><span>12<br />PADDLING</span></div>
-            <div class="avatar-stop" data-ratio=".5"><img class="surfer-sprite" src="assets/winki-surfer-source.png" alt="" /><span>25<br />UP &amp; RIDING</span></div>
-            <div class="avatar-stop" data-ratio=".75"><img class="surfer-sprite" src="assets/winki-surfer-source.png" alt="" /><span>38<br />CHARGING</span></div>
-            <div class="avatar-stop" data-ratio="1"><span class="boss-flag">★</span><span>50<br />BOSS CLEAR</span></div>
-          </div>
+        <div class="wave-brand" aria-hidden="true">
+          <img src="assets/winki-wave-icon.svg" alt="" />
+        </div>
+        <div class="hero-progress" aria-label="Weekly progress">
+          <div class="hero-progress-track"><span id="hero-progress-fill"></span></div>
+          <div class="hero-progress-labels"><span>0</span><span id="hero-progress-current">0 pts</span><span id="hero-progress-goal">50</span></div>
         </div>
       </section>
 
@@ -51,15 +47,14 @@
         <div class="section-heading">
           <div>
             <p class="eyebrow">Winki forecast</p>
-            <h2>Today’s surf</h2>
+            <h2>3-day outlook</h2>
           </div>
           <p id="forecast-updated" class="forecast-updated">Loading marine forecast…</p>
         </div>
         <div id="forecast-grid" class="forecast-grid">
-          <div class="forecast-stat skeleton"><span>Call</span><strong>—</strong><p>loading</p></div>
-          <div class="forecast-stat skeleton"><span>Surf</span><strong>—</strong><p>wave height</p></div>
-          <div class="forecast-stat skeleton"><span>Swell</span><strong>—</strong><p>period + direction</p></div>
-          <div class="forecast-stat skeleton"><span>Wind</span><strong>—</strong><p>speed + direction</p></div>
+          <div class="forecast-day skeleton"><span>Today</span><strong>—</strong><p>Loading forecast</p></div>
+          <div class="forecast-day skeleton"><span>Tomorrow</span><strong>—</strong><p>Loading forecast</p></div>
+          <div class="forecast-day skeleton"><span>Day 3</span><strong>—</strong><p>Loading forecast</p></div>
         </div>
         <p class="forecast-source">Open-Meteo marine and weather model guidance for the Bells/Winki area. Use local judgement before paddling out.</p>
       </section>
@@ -102,12 +97,6 @@
           <strong id="monthly-current">0</strong><span class="points-label"> / <span id="monthly-goal">200</span> pts</span>
           <div class="progress"><span id="monthly-bar"></span></div>
           <p id="monthly-message"></p>
-        </article>
-        <article class="score-card card" data-period="yearly">
-          <div class="score-title"><span>This year</span><span class="derived-goal">52 × weekly goal</span></div>
-          <strong id="yearly-current">0</strong><span class="points-label"> / <span id="yearly-goal">2600</span> pts</span>
-          <div class="progress"><span id="yearly-bar"></span></div>
-          <p id="yearly-message"></p>
         </article>
       </section>
 
